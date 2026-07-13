@@ -1,5 +1,5 @@
-import { promises as fsPromises } from 'fs';
 import fs from 'fs';
+
 import path from 'path';
 import crypto from 'crypto';
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
@@ -30,7 +30,7 @@ class DbService {
     try {
       const dbDir = path.dirname(config.localDbPath);
       if (!fs.existsSync(dbDir)) {
-        await fsPromises.mkdir(dbDir, { recursive: true });
+        fs.mkdirSync(dbDir, { recursive: true });
       }
       if (!fs.existsSync(config.localDbPath)) {
         const initialData = {
@@ -41,7 +41,7 @@ class DbService {
           comments: [],
           activity_logs: [],
         };
-        await fsPromises.writeFile(config.localDbPath, JSON.stringify(initialData, null, 2), 'utf-8');
+        fs.writeFileSync(config.localDbPath, JSON.stringify(initialData, null, 2), 'utf-8');
       }
       this.localDbInitialized = true;
     } catch (error) {
@@ -52,7 +52,7 @@ class DbService {
   private async readLocalDb(): Promise<any> {
     await this.initLocalDb();
     try {
-      const data = await fsPromises.readFile(config.localDbPath, 'utf-8');
+      const data = fs.readFileSync(config.localDbPath, 'utf-8');
       return JSON.parse(data);
     } catch (error) {
       console.error('Error reading local JSON database:', error);
@@ -70,7 +70,7 @@ class DbService {
   private async writeLocalDb(data: any): Promise<void> {
     await this.initLocalDb();
     try {
-      await fsPromises.writeFile(config.localDbPath, JSON.stringify(data, null, 2), 'utf-8');
+      fs.writeFileSync(config.localDbPath, JSON.stringify(data, null, 2), 'utf-8');
     } catch (error) {
       console.error('Error writing local JSON database:', error);
     }
