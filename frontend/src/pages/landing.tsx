@@ -1,11 +1,10 @@
 import { Link } from 'react-router-dom';
-import { motion } from 'framer-motion';
+import { motion, Variants } from 'framer-motion';
 import { useAuthStore } from '../store/auth';
 import { 
   ArrowRight,
   Database,
   Layout,
-  Lock,
   Zap,
   Globe,
   Users,
@@ -20,12 +19,12 @@ export function LandingPage() {
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
 
   // Common animation variants for scroll reveal
-  const fadeUp = {
+  const fadeUp: Variants = {
     hidden: { opacity: 0, y: 40 },
     visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: "easeOut" } }
   };
   
-  const staggerContainer = {
+  const staggerContainer: Variants = {
     hidden: { opacity: 0 },
     visible: {
       opacity: 1,
