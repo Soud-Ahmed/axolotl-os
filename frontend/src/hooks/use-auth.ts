@@ -133,3 +133,25 @@ export function useResetPassword() {
     },
   });
 }
+
+export function useOAuthSignIn() {
+  const setLoading = useAuthStore((s) => s.setLoading);
+
+  return useMutation({
+    mutationFn: async (provider: 'google' | 'github') => {
+      setLoading(true);
+      const { data, error } = await supabase.auth.signInWithOAuth({
+        provider,
+        options: {
+          redirectTo: `${window.location.origin}/dashboard`,
+        },
+      });
+      if (error) throw error;
+      return data;
+    },
+    onError: (error) => {
+      setLoading(false);
+      console.error('OAuth error:', error);
+    },
+  });
+}
