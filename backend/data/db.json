@@ -1,0 +1,29 @@
+{
+  "profiles": [
+    {
+      "id": "f534144f-91ac-4ffc-88f2-97fbfcb50a51",
+      "email": "mohammedsoudahmed@gmail.com",
+      "name": "Soud Ahmed",
+      "role": "super_admin",
+      "createdAt": "2026-07-09T12:20:05.218Z",
+      "passwordHash": "e7adb35a19736c23f79fc14c4593c48b:3c875505af7ce874ad2511a08212591f37a887f81c9fb548a48c1740112e8ab8bb4029df728be5d2ca05a910f924a98ae07e73c61d40ed4df7e65cb86bca8deb"
+    }
+  ],
+  "articles": [],
+  "media_assets": [],
+  "tasks": [],
+  "comments": [],
+  "activity_logs": [
+    {
+      "id": "1872fa6d-a780-498b-99bc-e8fc5576bffb",
+      "userId": "f534144f-91ac-4ffc-88f2-97fbfcb50a51",
+      "userName": "Soud Ahmed",
+      "userRole": "writer",
+      "action": "Signed up",
+      "entityType": "user",
+      "entityId": "f534144f-91ac-4ffc-88f2-97fbfcb50a51",
+      "entityName": "Soud Ahmed",
+      "createdAt": "2026-07-09T12:20:05.220Z"
+    }
+  ]
+}
