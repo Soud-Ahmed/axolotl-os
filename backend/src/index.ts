@@ -93,6 +93,10 @@ app.get('/health', (req: Request, res: Response) => {
 app.use(errorHandler);
 
 // Start Server
-app.listen(port, () => {
-  console.log(`Axolotl-OS Server running on port ${port} [Mode: ${config.isSupabaseConfigured() ? 'Supabase' : 'Local File Fallback'}]`);
-});
+if (process.env.NODE_ENV !== 'production') {
+  app.listen(port, () => {
+    console.log(`Axolotl-OS Server running on port ${port} [Mode: ${config.isSupabaseConfigured() ? 'Supabase' : 'Local File Fallback'}]`);
+  });
+}
+
+export default app;
