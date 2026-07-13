@@ -6,6 +6,6 @@
     "backend"
   ],
   "scripts": {
-    "build": "npm run build --workspaces"
+    "build": "npm run build --workspaces && rm -rf dist && cp -r frontend/dist dist"
   }
 }
