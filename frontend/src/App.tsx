@@ -30,19 +30,22 @@ function App() {
   const [displayLocation, setDisplayLocation] = useState(location);
   const [isTransitioning, setIsTransitioning] = useState(false);
   const [isBooting, setIsBooting] = useState(true);
+  const [hasBooted, setHasBooted] = useState(false);
 
   // Initial boot sequence (website loader)
   useEffect(() => {
     const timer = setTimeout(() => {
       setIsBooting(false);
+      // Give a tiny buffer for the exit animation before declaring fully booted
+      setTimeout(() => setHasBooted(true), 800);
     }, 2500); // 2.5 seconds boot sequence
     return () => clearTimeout(timer);
   }, []);
 
   // Route transition loader
   useEffect(() => {
-    // We only want to trigger the page transition loader if we aren't currently booting
-    if (!isBooting && location.pathname !== displayLocation.pathname) {
+    // Only trigger page transitions AFTER the boot sequence has completely finished
+    if (hasBooted && location.pathname !== displayLocation.pathname) {
       setIsTransitioning(true);
       
       const timer = setTimeout(() => {
@@ -51,8 +54,11 @@ function App() {
       }, 700); // 0.7s artificial delay for page transitions
 
       return () => clearTimeout(timer);
+    } else if (!hasBooted) {
+      // If we are still booting, just quietly sync the location without showing the page loader
+      setDisplayLocation(location);
     }
-  }, [location, displayLocation.pathname, isBooting]);
+  }, [location, displayLocation.pathname, hasBooted]);
 
   return (
     <>
@@ -62,57 +68,56 @@ function App() {
       </AnimatePresence>
 
       {/* 2. Page Transition Loader (Plays on route changes) */}
-      {!isBooting && isTransitioning && <Loader />}
+      {hasBooted && isTransitioning && <Loader />}
       
       {/* 3. Main Application Routes */}
-      {!isBooting && (
-        <Suspense fallback={<Loader />}>
-          {/* Pass the frozen displayLocation so the old page stays visible underneath the loader until the delay is over */}
-          <Routes location={displayLocation}>
-            <Route element={<RootLayout />}>
-              {/* Public Landing Page */}
-              <Route path="/" element={<LandingPage />} />
-              
-              {/* Public Forbidden Error Page */}
-              <Route path="/forbidden" element={<ForbiddenPage />} />
+      {/* Always render this so lazy chunks download IN THE BACKGROUND while the boot screen plays */}
+      <Suspense fallback={null}>
+        {/* Pass the frozen displayLocation so the old page stays visible underneath the loader until the delay is over */}
+        <Routes location={displayLocation}>
+          <Route element={<RootLayout />}>
+            {/* Public Landing Page */}
+            <Route path="/" element={<LandingPage />} />
+            
+            {/* Public Forbidden Error Page */}
+            <Route path="/forbidden" element={<ForbiddenPage />} />
 
-              {/* Guest routes (Auth) - redirects authenticated users to /dashboard */}
-              <Route element={<GuestRoute />}>
-                <Route element={<AuthLayout />}>
-                  <Route path="/login" element={<LoginPage />} />
-                  <Route path="/register" element={<RegisterPage />} />
-                  <Route path="/forgot-password" element={<ForgotPasswordPage />} />
-                  <Route path="/reset-password" element={<ResetPasswordPage />} />
-                  <Route path="/verify-email" element={<VerifyEmailPage />} />
-                </Route>
+            {/* Guest routes (Auth) - redirects authenticated users to /dashboard */}
+            <Route element={<GuestRoute />}>
+              <Route element={<AuthLayout />}>
+                <Route path="/login" element={<LoginPage />} />
+                <Route path="/register" element={<RegisterPage />} />
+                <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+                <Route path="/reset-password" element={<ResetPasswordPage />} />
+                <Route path="/verify-email" element={<VerifyEmailPage />} />
               </Route>
-
-              {/* Private routes (OS Modules) - redirects guests to /login */}
-              <Route element={<ProtectedRoute />}>
-                <Route element={<DashboardLayout />}>
-                  <Route path="/dashboard" element={<DashboardPage />} />
-                  <Route path="/content" element={<ContentPage />} />
-                  <Route path="/media" element={<MediaPage />} />
-                  <Route path="/tasks" element={<TasksPage />} />
-                  
-                  {/* Super Admin & Admin Only */}
-                  <Route element={<RoleProtectedRoute allowedRoles={['super_admin', 'admin']} />}>
-                    <Route path="/users" element={<UsersPage />} />
-                  </Route>
-
-                  {/* Super Admin Only */}
-                  <Route element={<RoleProtectedRoute allowedRoles={['super_admin']} />}>
-                    <Route path="/settings" element={<SettingsPage />} />
-                  </Route>
-                </Route>
-              </Route>
-
-              {/* Fallbacks */}
-              <Route path="*" element={<NotFoundPage />} />
             </Route>
-          </Routes>
-        </Suspense>
-      )}
+
+            {/* Private routes (OS Modules) - redirects guests to /login */}
+            <Route element={<ProtectedRoute />}>
+              <Route element={<DashboardLayout />}>
+                <Route path="/dashboard" element={<DashboardPage />} />
+                <Route path="/content" element={<ContentPage />} />
+                <Route path="/media" element={<MediaPage />} />
+                <Route path="/tasks" element={<TasksPage />} />
+                
+                {/* Super Admin & Admin Only */}
+                <Route element={<RoleProtectedRoute allowedRoles={['super_admin', 'admin']} />}>
+                  <Route path="/users" element={<UsersPage />} />
+                </Route>
+
+                {/* Super Admin Only */}
+                <Route element={<RoleProtectedRoute allowedRoles={['super_admin']} />}>
+                  <Route path="/settings" element={<SettingsPage />} />
+                </Route>
+              </Route>
+            </Route>
+
+            {/* Fallbacks */}
+            <Route path="*" element={<NotFoundPage />} />
+          </Route>
+        </Routes>
+      </Suspense>
     </>
   );
 }
