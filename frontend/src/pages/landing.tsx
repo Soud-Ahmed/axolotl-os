@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom';
 import { motion, Variants } from 'framer-motion';
 import { useAuthStore } from '../store/auth';
+import { useUiStore } from '../store/ui';
 import { 
   ArrowRight,
   Database,
@@ -17,6 +18,11 @@ import {
 
 export function LandingPage() {
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
+  const hasBooted = useUiStore((s) => s.hasBooted);
+
+  // Return null until the boot sequence is completely finished.
+  // This ensures framer-motion doesn't play the intro animations in the background!
+  if (!hasBooted) return null;
 
   // Common animation variants for scroll reveal
   const fadeUp: Variants = {

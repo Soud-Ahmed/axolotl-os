@@ -8,6 +8,7 @@ import { ProtectedRoute, RoleProtectedRoute } from './middleware/protected-route
 import { GuestRoute } from './middleware/guest-route';
 import { Loader } from './components/ui/loader';
 import { InitialLoader } from './components/ui/initial-loader';
+import { useUiStore } from './store/ui';
 
 // Lazy-loaded pages for better performance and route transitions
 const LoginPage = lazy(() => import('./pages/login').then(module => ({ default: module.LoginPage })));
@@ -30,7 +31,7 @@ function App() {
   const [displayLocation, setDisplayLocation] = useState(location);
   const [isTransitioning, setIsTransitioning] = useState(false);
   const [isBooting, setIsBooting] = useState(true);
-  const [hasBooted, setHasBooted] = useState(false);
+  const { hasBooted, setHasBooted } = useUiStore();
 
   // Initial boot sequence (website loader)
   useEffect(() => {
@@ -40,7 +41,7 @@ function App() {
       setTimeout(() => setHasBooted(true), 800);
     }, 2500); // 2.5 seconds boot sequence
     return () => clearTimeout(timer);
-  }, []);
+  }, [setHasBooted]);
 
   // Route transition loader
   useEffect(() => {
