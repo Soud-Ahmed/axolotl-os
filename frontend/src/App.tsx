@@ -47,10 +47,12 @@ function App() {
   useEffect(() => {
     // Only trigger page transitions AFTER the boot sequence has completely finished
     if (hasBooted && location.pathname !== displayLocation.pathname) {
+      // Switch to the new page immediately so the loader blurs the *new* page instead of the old one
+      setDisplayLocation(location);
       setIsTransitioning(true);
       
       const timer = setTimeout(() => {
-        setDisplayLocation(location);
+        // Remove the loader after the delay
         setIsTransitioning(false);
       }, 700); // 0.7s artificial delay for page transitions
 
