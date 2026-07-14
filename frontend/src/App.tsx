@@ -1,4 +1,4 @@
-import { Suspense, lazy, useState, useEffect } from 'react';
+import { Suspense, lazy, useState, useEffect, useRef } from 'react';
 import { Routes, Route, useLocation } from 'react-router-dom';
 import { AnimatePresence } from 'framer-motion';
 import { RootLayout } from './layouts/root-layout';
@@ -28,7 +28,7 @@ const ForbiddenPage = lazy(() => import('./pages/forbidden').then(module => ({ d
 
 function App() {
   const location = useLocation();
-  const [displayLocation, setDisplayLocation] = useState(location);
+  const prevLocationRef = useRef(location.pathname);
   const [isTransitioning, setIsTransitioning] = useState(false);
   const [isBooting, setIsBooting] = useState(true);
   const { hasBooted, setHasBooted } = useUiStore();
@@ -46,22 +46,17 @@ function App() {
   // Route transition loader
   useEffect(() => {
     // Only trigger page transitions AFTER the boot sequence has completely finished
-    if (hasBooted && location.pathname !== displayLocation.pathname) {
-      // Switch to the new page immediately so the loader blurs the *new* page instead of the old one
-      setDisplayLocation(location);
+    if (hasBooted && location.pathname !== prevLocationRef.current) {
       setIsTransitioning(true);
+      prevLocationRef.current = location.pathname;
       
       const timer = setTimeout(() => {
-        // Remove the loader after the delay
         setIsTransitioning(false);
       }, 700); // 0.7s artificial delay for page transitions
 
       return () => clearTimeout(timer);
-    } else if (!hasBooted) {
-      // If we are still booting, just quietly sync the location without showing the page loader
-      setDisplayLocation(location);
     }
-  }, [location, displayLocation.pathname, hasBooted]);
+  }, [location.pathname, hasBooted]);
 
   return (
     <>
@@ -76,8 +71,7 @@ function App() {
       {/* 3. Main Application Routes */}
       {/* Always render this so lazy chunks download IN THE BACKGROUND while the boot screen plays */}
       <Suspense fallback={null}>
-        {/* Pass the frozen displayLocation so the old page stays visible underneath the loader until the delay is over */}
-        <Routes location={displayLocation}>
+        <Routes location={location}>
           <Route element={<RootLayout />}>
             {/* Public Landing Page */}
             <Route path="/" element={<LandingPage />} />

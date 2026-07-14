@@ -2,7 +2,7 @@ import { motion } from 'framer-motion';
 
 export function Loader() {
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-white/40 backdrop-blur-sm">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-white">
       <motion.div 
         className="flex flex-col items-center gap-3 rounded-2xl bg-white px-8 py-5 shadow-[0_8px_30px_rgb(0,0,0,0.08)] border border-gray-100"
         initial={{ opacity: 0, y: 10 }}
