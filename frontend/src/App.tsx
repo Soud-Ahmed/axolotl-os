@@ -47,8 +47,14 @@ function App() {
   useEffect(() => {
     // Only trigger page transitions AFTER the boot sequence has completely finished
     if (hasBooted && location.pathname !== prevLocationRef.current) {
-      setIsTransitioning(true);
       prevLocationRef.current = location.pathname;
+      
+      // Do not show the page transition loader when redirecting/navigating to the home page
+      if (location.pathname === '/') {
+        return;
+      }
+
+      setIsTransitioning(true);
       
       const timer = setTimeout(() => {
         setIsTransitioning(false);
